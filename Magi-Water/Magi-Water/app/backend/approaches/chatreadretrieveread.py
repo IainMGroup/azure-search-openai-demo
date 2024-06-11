@@ -6,14 +6,13 @@ from openai import AsyncOpenAI, AsyncStream
 from openai.types.chat import (
     ChatCompletion,
     ChatCompletionChunk,
-    ChatCompletionMessageParam,
     ChatCompletionToolParam,
 )
-from openai_messages_token_helper import build_messages, get_token_limit
 
 from approaches.approach import ThoughtStep
 from approaches.chatapproach import ChatApproach
 from core.authentication import AuthenticationHelper
+from core.modelhelper import get_token_limit
 
 
 class ChatReadRetrieveReadApproach(ChatApproach):
@@ -33,7 +32,6 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         chatgpt_deployment: Optional[str],  # Not needed for non-Azure OpenAI
         embedding_deployment: Optional[str],  # Not needed for non-Azure OpenAI or for retrieval_mode="text"
         embedding_model: str,
-        embedding_dimensions: int,
         sourcepage_field: str,
         content_field: str,
         query_language: str,
@@ -46,7 +44,6 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         self.chatgpt_deployment = chatgpt_deployment
         self.embedding_deployment = embedding_deployment
         self.embedding_model = embedding_model
-        self.embedding_dimensions = embedding_dimensions
         self.sourcepage_field = sourcepage_field
         self.content_field = content_field
         self.query_language = query_language
@@ -55,7 +52,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
     @property
     def system_message_chat_conversation(self):
-         return """Your name is Magi and you are an assistant that helps bid writers respond to questions being asked in requests for information and or prequalification questions. Be brief in your answers.
+       return """Your name is Magi and you are an assistant that helps bid writers respond to questions being asked in requests for information and or prequalification questions. Be brief in your answers.
         Answer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.
         For tabular information return it as an html table. Do not return markdown format. If the question is not in English, answer in the language used in the question.
         Each source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, for example [info1.txt]. Don't combine sources, list each source separately, for example [info1.txt][info2.pdf].
@@ -66,7 +63,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
     @overload
     async def run_until_final_call(
         self,
-        messages: list[ChatCompletionMessageParam],
+        history: list[dict[str, str]],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
         should_stream: Literal[False],
@@ -75,7 +72,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
     @overload
     async def run_until_final_call(
         self,
-        messages: list[ChatCompletionMessageParam],
+        history: list[dict[str, str]],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
         should_stream: Literal[True],
@@ -83,7 +80,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
     async def run_until_final_call(
         self,
-        messages: list[ChatCompletionMessageParam],
+        history: list[dict[str, str]],
         overrides: dict[str, Any],
         auth_claims: dict[str, Any],
         should_stream: bool = False,
@@ -92,15 +89,10 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         has_vector = overrides.get("retrieval_mode") in ["vectors", "hybrid", None]
         use_semantic_captions = True if overrides.get("semantic_captions") and has_text else False
         top = overrides.get("top", 3)
-        minimum_search_score = overrides.get("minimum_search_score", 0.0)
-        minimum_reranker_score = overrides.get("minimum_reranker_score", 0.0)
-
         filter = self.build_filter(overrides, auth_claims)
         use_semantic_ranker = True if overrides.get("semantic_ranker") and has_text else False
 
-        original_user_query = messages[-1]["content"]
-        if not isinstance(original_user_query, str):
-            raise ValueError("The most recent message content must be a string.")
+        original_user_query = history[-1]["content"]
         user_query_request = "Generate search query for: " + original_user_query
 
         tools: List[ChatCompletionToolParam] = [
@@ -124,25 +116,24 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         ]
 
         # STEP 1: Generate an optimized keyword search query based on the chat history and the last question
-        query_response_token_limit = 100
-        query_messages = build_messages(
-            model=self.chatgpt_model,
+        query_messages = self.get_messages_from_history(
             system_prompt=self.query_prompt_template,
-            tools=tools,
+            model_id=self.chatgpt_model,
+            history=history,
+            user_content=user_query_request,
+            max_tokens=self.chatgpt_token_limit - len(user_query_request),
             few_shots=self.query_prompt_few_shots,
-            past_messages=messages[:-1],
-            new_user_content=user_query_request,
-            max_tokens=self.chatgpt_token_limit - query_response_token_limit,
         )
 
         chat_completion: ChatCompletion = await self.openai_client.chat.completions.create(
             messages=query_messages,  # type: ignore
-            # Azure OpenAI takes the deployment name as the model name
+            # Azure Open AI takes the deployment name as the model name
             model=self.chatgpt_deployment if self.chatgpt_deployment else self.chatgpt_model,
             temperature=0.0,  # Minimize creativity for search query generation
-            max_tokens=query_response_token_limit,  # Setting too low risks malformed JSON, setting too high may affect performance
+            max_tokens=100,  # Setting too low risks malformed JSON, setting too high may affect performance
             n=1,
             tools=tools,
+            tool_choice="auto",
         )
 
         query_text = self.get_search_query(chat_completion, original_user_query)
@@ -158,16 +149,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         if not has_text:
             query_text = None
 
-        results = await self.search(
-            top,
-            query_text,
-            filter,
-            vectors,
-            use_semantic_ranker,
-            use_semantic_captions,
-            minimum_search_score,
-            minimum_reranker_score,
-        )
+        results = await self.search(top, query_text, filter, vectors, use_semantic_ranker, use_semantic_captions)
 
         sources_content = self.get_sources_content(results, use_semantic_captions, use_image_citation=False)
         content = "\n".join(sources_content)
@@ -181,13 +163,14 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         )
 
         response_token_limit = 1024
-        messages = build_messages(
-            model=self.chatgpt_model,
+        messages_token_limit = self.chatgpt_token_limit - response_token_limit
+        messages = self.get_messages_from_history(
             system_prompt=system_message,
-            past_messages=messages[:-1],
+            model_id=self.chatgpt_model,
+            history=history,
             # Model does not handle lengthy system messages well. Moving sources to latest user conversation to solve follow up questions prompt.
-            new_user_content=original_user_query + "\n\nSources:\n" + content,
-            max_tokens=self.chatgpt_token_limit - response_token_limit,
+            user_content=original_user_query + "\n\nSources:\n" + content,
+            max_tokens=messages_token_limit,
         )
 
         data_points = {"text": sources_content}
@@ -232,7 +215,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
         }
 
         chat_coroutine = self.openai_client.chat.completions.create(
-            # Azure OpenAI takes the deployment name as the model name
+            # Azure Open AI takes the deployment name as the model name
             model=self.chatgpt_deployment if self.chatgpt_deployment else self.chatgpt_model,
             messages=messages,
             temperature=overrides.get("temperature", 0.3),

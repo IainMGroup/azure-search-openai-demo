@@ -32,7 +32,7 @@ var actualSearchServiceSemanticRankerLevel = (searchServiceSkuName == 'standard'
 param storageAccountName string = '' // Set in main.parameters.json
 param storageResourceGroupName string = '' // Set in main.parameters.json
 param storageResourceGroupLocation string = location
-param storageContainerName string = 'content'
+param storageContainerName string = 'water-bms-content'
 param storageSkuName string // Set in main.parameters.json
 
 param userStorageAccountName string = ''
@@ -98,7 +98,7 @@ var chatGpt = {
   modelName: !empty(chatGptModelName) ? chatGptModelName : startsWith(openAiHost, 'azure') ? 'gpt-4' : 'gpt-4'
   deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'Chat4-Turbo'
   deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : 'turbo-2024-04-09'
-  deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 50
+  deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 30
 }
 
 param embeddingModelName string = ''

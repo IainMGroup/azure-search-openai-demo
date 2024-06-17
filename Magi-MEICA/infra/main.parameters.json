@@ -15,22 +15,22 @@
       "value": "${AZURE_PRINCIPAL_ID}"
     },
     "openAiServiceName": {
-      "value": "${AZURE_OPENAI_SERVICE}"
+      "value": "${AZURE_OPENAI_SERVICE=cog-MGS-OpenAI}"
     },
     "openAiResourceGroupName": {
-      "value": "${AZURE_OPENAI_RESOURCE_GROUP}"
+      "value": "${AZURE_OPENAI_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "openAiSkuName": {
       "value": "S0"
     },
     "computerVisionServiceName": {
-      "value": "${AZURE_COMPUTER_VISION_SERVICE}"
+      "value": "${AZURE_COMPUTER_VISION_SERVICE=mgs-cv}"
     },
     "computerVisionResourceGroupName": {
-      "value": "${AZURE_COMPUTER_VISION_RESOURCE_GROUP}"
+      "value": "${AZURE_COMPUTER_VISION_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "computerVisionResourceGroupLocation": {
-      "value": "${AZURE_COMPUTER_VISION_LOCATION=eastus}"
+      "value": "${AZURE_COMPUTER_VISION_LOCATION=uksouth}"
     },
     "computerVisionSkuName": {
       "value": "${AZURE_COMPUTER_VISION_SKU=S1}"
@@ -39,46 +39,46 @@
       "value": "${AZURE_DOCUMENTINTELLIGENCE_SERVICE}"
     },
     "documentIntelligenceResourceGroupName": {
-      "value": "${AZURE_DOCUMENTINTELLIGENCE_RESOURCE_GROUP}"
+      "value": "${AZURE_DOCUMENTINTELLIGENCE_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "documentIntelligenceSkuName": {
       "value": "${AZURE_DOCUMENTINTELLIGENCE_SKU=S0}"
     },
     "documentIntelligenceResourceGroupLocation": {
-      "value": "${AZURE_DOCUMENTINTELLIGENCE_LOCATION}"
+      "value": "${AZURE_DOCUMENTINTELLIGENCE_LOCATION=westeurope}"
     },
     "searchIndexName": {
-      "value": "${AZURE_SEARCH_INDEX=gptkbindex}"
+      "value": "${AZURE_SEARCH_INDEX=meica-index}"
     },
     "searchServiceName": {
-      "value": "${AZURE_SEARCH_SERVICE}"
+      "value": "${AZURE_SEARCH_SERVICE=cog-search-mgs}"
     },
     "searchServiceResourceGroupName": {
-      "value": "${AZURE_SEARCH_SERVICE_RESOURCE_GROUP}"
+      "value": "${AZURE_SEARCH_SERVICE_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "searchServiceLocation": {
-      "value": "${AZURE_SEARCH_SERVICE_LOCATION}"
+      "value": "${AZURE_SEARCH_SERVICE_LOCATION=ukwest}"
     },
     "searchServiceSkuName": {
       "value": "${AZURE_SEARCH_SERVICE_SKU=standard}"
     },
     "searchQueryLanguage": {
-      "value": "${AZURE_SEARCH_QUERY_LANGUAGE=en-us}"
+      "value": "${AZURE_SEARCH_QUERY_LANGUAGE=en-GB}"
     },
     "searchQuerySpeller": {
-      "value": "${AZURE_SEARCH_QUERY_SPELLER=lexicon}"
+      "value": "${AZURE_SEARCH_QUERY_SPELLER=en-GB}"
     },
     "searchServiceSemanticRankerLevel": {
-      "value": "${AZURE_SEARCH_SEMANTIC_RANKER=free}"
+      "value": "${AZURE_SEARCH_SEMANTIC_RANKER=standard}"
     },
     "storageAccountName": {
-      "value": "${AZURE_STORAGE_ACCOUNT}"
+      "value": "${AZURE_STORAGE_ACCOUNT=stmgsopenai}"
     },
     "storageResourceGroupName": {
-      "value": "${AZURE_STORAGE_RESOURCE_GROUP}"
+      "value": "${AZURE_STORAGE_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "storageSkuName": {
-      "value": "${AZURE_STORAGE_SKU=Standard_LRS}"
+      "value": "${AZURE_STORAGE_SKU}"
     },
     "appServicePlanName": {
       "value": "${AZURE_APP_SERVICE_PLAN}"
@@ -90,31 +90,31 @@
       "value": "${AZURE_APP_SERVICE}"
     },
     "chatGptModelName":{
-      "value": "${AZURE_OPENAI_CHATGPT_MODEL}"
+      "value": "${AZURE_OPENAI_CHATGPT_MODEL=gpt-4o}"
     },
     "chatGptDeploymentName": {
-      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT}"
+      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT=chat}"
     },
     "chatGptDeploymentVersion":{
-      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT_VERSION}"
+      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT_VERSION=2024-05-13}"
     },
     "chatGptDeploymentCapacity":{
-      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT_CAPACITY}"
+      "value": "${AZURE_OPENAI_CHATGPT_DEPLOYMENT_CAPACITY=60}"
     },
     "embeddingModelName":{
-      "value": "${AZURE_OPENAI_EMB_MODEL_NAME}"
+      "value": "${AZURE_OPENAI_EMB_MODEL_NAME=text-embedding-ada-002}"
     },
     "embeddingDeploymentName": {
-      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT}"
+      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT=text}"
     },
     "embeddingDeploymentVersion":{
-      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT_VERSION}"
+      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT_VERSION=2}"
     },
     "embeddingDeploymentCapacity":{
-      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT_CAPACITY}"
+      "value": "${AZURE_OPENAI_EMB_DEPLOYMENT_CAPACITY=120}"
     },
     "embeddingDimensions": {
-      "value": "${AZURE_OPENAI_EMB_DIMENSIONS}"
+      "value": "${AZURE_OPENAI_EMB_DIMENSIONS=1536}"
     },
     "openAiHost": {
       "value": "${OPENAI_HOST=azure}"
@@ -156,19 +156,19 @@
       "value": "${USE_SPEECH_OUTPUT_BROWSER=false}"
     },
     "useSpeechOutputAzure": {
-      "value": "${USE_SPEECH_OUTPUT_AZURE=false}"
+      "value": "${USE_SPEECH_OUTPUT_AZURE=true}"
     },
     "speechServiceName": {
-      "value": "${AZURE_SPEECH_SERVICE}"
+      "value": "${AZURE_SPEECH_SERVICE=mgs-speech}"
     },
     "speechServiceSkuName": {
       "value": "${AZURE_SPEECH_SERVICE_SKU=S0}"
     },
     "speechServiceResourceGroupName": {
-      "value": "${AZURE_SPEECH_SERVICE_RESOURCE_GROUP}"
+      "value": "${AZURE_SPEECH_SERVICE_RESOURCE_GROUP=rg-MGS-OpenAI-Resources}"
     },
     "speechServiceLocation": {
-      "value": "${AZURE_SPEECH_SERVICE_LOCATION}"
+      "value": "${AZURE_SPEECH_SERVICE_LOCATION=uksouth}"
     },
     "useAuthentication": {
       "value": "${AZURE_USE_AUTHENTICATION=false}"
@@ -231,7 +231,7 @@
       "value": "${AZURE_VM_OS_OFFER=WindowsServer}"
     },
     "useIntegratedVectorization": {
-      "value": "${USE_FEATURE_INT_VECTORIZATION}"
+      "value": "${USE_FEATURE_INT_VECTORIZATION=true}"
     },
     "useUserUpload": {
       "value": "${USE_USER_UPLOAD}"

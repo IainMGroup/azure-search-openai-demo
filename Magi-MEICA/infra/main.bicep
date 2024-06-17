@@ -22,17 +22,17 @@ param searchServiceResourceGroupName string = '' // Set in main.parameters.json
 param searchServiceLocation string = '' // Set in main.parameters.json
 // The free tier does not support managed identity (required) or semantic search (optional)
 @allowed([ 'free', 'basic', 'standard', 'standard2', 'standard3', 'storage_optimized_l1', 'storage_optimized_l2' ])
-param searchServiceSkuName string // Set in main.parameters.json
+param searchServiceSkuName string = 'standard' // Set in main.parameters.json
 param searchIndexName string // Set in main.parameters.json
 param searchQueryLanguage string // Set in main.parameters.json
 param searchQuerySpeller string // Set in main.parameters.json
 param searchServiceSemanticRankerLevel string // Set in main.parameters.json
-var actualSearchServiceSemanticRankerLevel = (searchServiceSkuName == 'free') ? 'disabled' : searchServiceSemanticRankerLevel
+var actualSearchServiceSemanticRankerLevel = (searchServiceSkuName == 'free') ? 'standard' : searchServiceSemanticRankerLevel
 
-param storageAccountName string = '' // Set in main.parameters.json
-param storageResourceGroupName string = '' // Set in main.parameters.json
-param storageResourceGroupLocation string = location
-param storageContainerName string = 'content'
+param storageAccountName string // Set in main.parameters.json
+param storageResourceGroupName string // Set in main.parameters.json
+param storageResourceGroupLocation string
+param storageContainerName string
 param storageSkuName string // Set in main.parameters.json
 
 param userStorageAccountName string = ''
@@ -85,8 +85,8 @@ param documentIntelligenceResourceGroupLocation string
 
 param documentIntelligenceSkuName string // Set in main.parameters.json
 
-param computerVisionServiceName string = '' // Set in main.parameters.json
-param computerVisionResourceGroupName string = '' // Set in main.parameters.json
+param computerVisionServiceName string = 'mgs-cv' // Set in main.parameters.json
+param computerVisionResourceGroupName string = 'rg-MGS-OpenAI-Resources' // Set in main.parameters.json
 param computerVisionResourceGroupLocation string = '' // Set in main.parameters.json
 param computerVisionSkuName string // Set in main.parameters.json
 
@@ -95,29 +95,29 @@ param chatGptDeploymentName string = ''
 param chatGptDeploymentVersion string = ''
 param chatGptDeploymentCapacity int = 0
 var chatGpt = {
-  modelName: !empty(chatGptModelName) ? chatGptModelName : startsWith(openAiHost, 'azure') ? 'gpt-35-turbo' : 'gpt-3.5-turbo'
+  modelName: !empty(chatGptModelName) ? chatGptModelName : startsWith(openAiHost, 'azure') ? 'gpt-4o' : 'gpt-4o'
   deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'chat'
-  deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '0613'
-  deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 30
+  deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '2024-05-13'
+  deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 60
 }
 
-param embeddingModelName string = ''
-param embeddingDeploymentName string = ''
-param embeddingDeploymentVersion string = ''
-param embeddingDeploymentCapacity int = 0
-param embeddingDimensions int = 0
+param embeddingModelName string = 'text-embedding-ada-002'
+param embeddingDeploymentName string = 'text'
+param embeddingDeploymentVersion string = '2'
+param embeddingDeploymentCapacity int = 120
+param embeddingDimensions int = 1536
 var embedding = {
   modelName: !empty(embeddingModelName) ? embeddingModelName : 'text-embedding-ada-002'
-  deploymentName: !empty(embeddingDeploymentName) ? embeddingDeploymentName : 'embedding'
+  deploymentName: !empty(embeddingDeploymentName) ? embeddingDeploymentName : 'text'
   deploymentVersion: !empty(embeddingDeploymentVersion) ? embeddingDeploymentVersion : '2'
-  deploymentCapacity: embeddingDeploymentCapacity != 0 ? embeddingDeploymentCapacity : 30
+  deploymentCapacity: embeddingDeploymentCapacity != 0 ? embeddingDeploymentCapacity : 120
   dimensions: embeddingDimensions != 0 ? embeddingDimensions : 1536
 }
 
 param gpt4vModelName string = 'gpt-4o'
 param gpt4vDeploymentName string = 'gpt-4o'
 param gpt4vModelVersion string = '2024-05-13'
-param gpt4vDeploymentCapacity int = 10
+param gpt4vDeploymentCapacity int = 60
 
 param tenantId string = tenant().tenantId
 param authTenantId string = ''

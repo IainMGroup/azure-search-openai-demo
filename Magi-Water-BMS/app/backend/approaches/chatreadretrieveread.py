@@ -55,7 +55,7 @@ class ChatReadRetrieveReadApproach(ChatApproach):
 
     @property
     def system_message_chat_conversation(self):
-         return """Welcome to the Document Query Assistant! If you need information on specific documents within our Business Management System (BMS), 
+         return """Welcome to Magi, your Document Query Assistant! If you need information on specific documents within our Business Management System (BMS), 
          you've come to the right place. Please enter the document name or ID you're inquiring about, and I'll provide you with the details you need. 
          Whether it's document status, revision history, or associated metadata, I'm here to help you navigate and retrieve the information swiftly. 
          For complex queries or additional support, please don't hesitate to ask. Let's get started!"
